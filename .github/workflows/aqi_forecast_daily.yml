@@ -1,0 +1,32 @@
+name: Daily AQI Forecast Update
+
+on:
+  schedule:
+    - cron: '0 3 * * *'   # Runs daily at 03:00 UTC
+  workflow_dispatch:       # Allows manual run from GitHub too
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run AQI Forecast Script
+        run: python multi_city_aqi_forecast.py
+
+      - name: Commit and Push Updated Data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Auto-update AQI data and forecasts"
+          git push
